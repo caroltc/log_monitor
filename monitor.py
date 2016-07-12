@@ -22,7 +22,7 @@ mail_config = [
     ['smtp.sina.cn', 'caroltc@sina.cn', '******'],
     ['smtp.sina.cn', 'caroltc@sina.cn', '******']
 ]
-receivers = ['ctang1@ibenben.com']  # default接收邮件
+default_receivers = ['ctang1@ibenben.com']  # default接收邮件
 
 def monitorLog(find_key, log_path, log_file_name, monitor_file, receivers):
     log_file = log_path+log_file_name
@@ -78,7 +78,7 @@ def sendMail(subject, content, receivers):
 
 if __name__ == '__main__':
     for log_file in (log_files):
-        mail_receivers = receivers + log_file[4]
+        mail_receivers = default_receivers + log_file[4]
         monitorLog(log_file[0], log_file[1], log_file[2], log_file[3], mail_receivers)
         time.sleep(3)
 
