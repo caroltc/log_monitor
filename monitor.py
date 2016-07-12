@@ -12,19 +12,19 @@ from email.header import Header
 stoptime = time.strftime('%Y-%m-%d', time.localtime(time.time() + 10))
 log_path = '/phpstudy/log/www/wmsadminapi/'
 log_files =[
-    ["grep -rn 'error_code'", log_path, "Api"+ '.' + stoptime + '*.log',  log_path+"Api_monitor"+ '.' + stoptime + '.log'],
-    ["grep -rn 'error_code'", log_path, "basic"+ '.' + stoptime + '*.log', log_path+"basic_monitor"+ '.' + stoptime + '.log'],
-    ["grep -rn 'error'", log_path, "production"+ '.' + stoptime + '*.log', log_path+"production_monitor"+ '.' + stoptime + '.log'],
-    ["grep -rn 'error'", log_path, "Stocktake"+ '.' + stoptime + '*.log', log_path+"Stocktake_monitor"+ '.' + stoptime + '.log']
+    ["grep -rn 'error_code'", log_path, "Api"+ '.' + stoptime + '*.log',  log_path+"Api_monitor"+ '.' + stoptime + '.log', ['312493732@qq.com']],
+    ["grep -rn 'error_code'", log_path, "basic"+ '.' + stoptime + '*.log', log_path+"basic_monitor"+ '.' + stoptime + '.log', []],
+    ["grep -rn 'error'", log_path, "production"+ '.' + stoptime + '*.log', log_path+"production_monitor"+ '.' + stoptime + '.log', []],
+    ["grep -rn 'error'", log_path, "Stocktake"+ '.' + stoptime + '*.log', log_path+"Stocktake_monitor"+ '.' + stoptime + '.log', []]
  ]
 
 mail_config = [
-    ['smtp.sina.cn', 'caroltc@sina.cn1', 'password1'],
-    ['smtp.sina.cn', 'caroltc@sina.cn2', 'password2']
+    ['smtp.sina.cn', 'caroltc@sina.cn', '******'],
+    ['smtp.sina.cn', 'caroltc@sina.cn', '******']
 ]
-receivers = ['ctang1@ibenben.com']  # 接收邮件
+receivers = ['ctang1@ibenben.com']  # default接收邮件
 
-def monitorLog(find_key, log_path, log_file_name, monitor_file):
+def monitorLog(find_key, log_path, log_file_name, monitor_file, receivers):
     log_file = log_path+log_file_name
     print '监控的日志文件 %s' % log_file
     popen = subprocess.Popen(find_key+' ' + log_file, stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True)
@@ -47,7 +47,7 @@ def monitorLog(find_key, log_path, log_file_name, monitor_file):
         for i in range(store_nums , now_nums):
             content = content + "\n" +lines[i]
         try:
-            sendMail(str(now_nums - store_nums)+' errors in '+log_file_name, content)
+            sendMail(str(now_nums - store_nums)+' errors in '+log_file_name, content, receivers)
         except Exception,e:
             print(str(e))
             popen.kill()
@@ -57,7 +57,7 @@ def monitorLog(find_key, log_path, log_file_name, monitor_file):
     f.close()
     popen.kill()
 
-def sendMail(subject, content):
+def sendMail(subject, content, receivers):
     mail_info = mail_config[random.randint(0, (len(mail_config)-1))]
     mail_host = mail_info[0]
     mail_user = mail_info[1]
@@ -78,6 +78,7 @@ def sendMail(subject, content):
 
 if __name__ == '__main__':
     for log_file in (log_files):
-        monitorLog(log_file[0], log_file[1], log_file[2], log_file[3])
+        mail_receivers = receivers + log_file[4]
+        monitorLog(log_file[0], log_file[1], log_file[2], log_file[3], mail_receivers)
         time.sleep(3)
 
